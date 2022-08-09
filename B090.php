@@ -5,9 +5,8 @@ function getStdin(): string
     return trim(fgets(STDIN));
 }
 
-function findMaxDevidedVoteParty(array $partyVotes): int
+function findMaxDevidedVoteParty(array $devidedPartyVotes, array $partyVotes): int
 {
-    global $devidedPartyVotes;
     $maxDevidedVote = 0;
     $maxDevidedVoteParty = -1;
     $maxPartyVote = 0;
@@ -25,7 +24,6 @@ function findMaxDevidedVoteParty(array $partyVotes): int
         }
         $partyCount++;
     }
-    array_splice($devidedPartyVotes[$maxDevidedVoteParty], 0, 1);
 
     return $maxDevidedVoteParty;
 }
@@ -51,7 +49,9 @@ foreach ($partyVotes as $partyVote) {
 }
 
 for ($i = 0; $i < $seatNum; $i++) {
-    $partyGetSeats[findMaxDevidedVoteParty($partyVotes)]++;
+    $maxDevidedVoteParty = findMaxDevidedVoteParty($devidedPartyVotes, $partyVotes);
+    $partyGetSeats[$maxDevidedVoteParty]++;
+    array_splice($devidedPartyVotes[$maxDevidedVoteParty], 0, 1);
 }
 
 foreach ($partyGetSeats as $partySeat) {
