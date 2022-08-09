@@ -1,7 +1,10 @@
 <?php
 
+
 $purchaseList1 = new PurchaseList(getStdin());
-$purchaseList1->writeItemList();
+for ($i = 0; $i < $purchaseList1->getItemNum(); $i++) {
+    $purchaseList1->addItemList(explode(' ', getStdin()));
+}
 $purchaseList1->calcItemTypeSum();
 $list1Points = $purchaseList1->calcPoints();
 $list1PointSum = array_sum($list1Points);
@@ -17,24 +20,25 @@ function getStdin()
 class PurchaseList
 {
     const ITEM_TYPE_NUM = 4;
-    private $itemList = [[]];
-    private $itemTypeSum = [];
 
     public function __construct(
         private int $itemNum,
+        private array $itemList = [],
+        private array $itemTypeSum = [],
         private float $pointRateType0 = 0.05,
         private float $pointRateType1 = 0.03,
         private float $pointRateType2 = 0.02,
         private float $pointRateType3 = 0.01,
     ) {}
 
-    public function writeItemList(): array
+    public function getItemNum(): int
     {
-        for ($i = 0; $i < $this->itemNum; $i++) {
-            $this->itemList[$i] = explode(' ', getStdin());
-        }
+        return $this->itemNum;
+    }
 
-        return $this->itemList;
+    public function addItemList(array $itemList)
+    {
+        $this->itemList[] = $itemList;
     }
 
     public function calcItemTypeSum(): array
@@ -63,7 +67,7 @@ class PurchaseList
     {
         $points = [];
         for ($i = 0; $i < self::ITEM_TYPE_NUM; $i++) {
-            $points[] = (int)($this->itemTypeSum[$i] / 100) * 100 * $this->{"pointRateType".$i};
+            $points[] = (int)($this->itemTypeSum[$i] / 100) * 100 * $this->{"pointRateType" . $i};
         }
 
         return $points;
