@@ -1,19 +1,13 @@
 <?php
 
-
+$registerNum = trim(fgets(STDIN));
+$registerCapas = trim(fgets(STDIN));
 $commands = trim(fgets(STDIN));
-$registerNum = 5;
-$register0 = new Register(2); //レジ番号1
-$register1 = new Register(7); //2
-$register2 = new Register(3); //3
-$register3 = new Register(5); //4
-$register4 = new Register(2); //5
 $registers = [];
 
-for ($i = 0; $i < $registerNum; $i++) {
-    $registers[] = ${'register'.$i};
+foreach (str_split($registerCapas) as $registerCapa) {
+    $registers[] = new Register($registerCapa); //レジ番号0開始
 }
-
 
 foreach (str_split($commands) as $command) {
     if(is_numeric($command)) {
@@ -34,12 +28,10 @@ foreach (str_split($commands) as $command) {
     }
 }
 
-
 for ($i = 0; $i < $registerNum - 1; $i++) {
     echo $registers[$i]->getWaitNum().',';
 }
 echo $registers[$registerNum - 1]->getWaitNum(), PHP_EOL;
-
 
 class Register
 {
@@ -78,18 +70,15 @@ class Register
         if (!$this->closing) {
             if ($this->toCloseCount <= $this->capability && $this->toCloseCount >= 0) {
                 $this->waitNum -= $this->toCloseCount;
+                $this->toCloseCount = 0;
                 $this->closing = true;
-            } else {
-                $this->waitNum -= $this->capability;
-                $this->toCloseCount -= $this->capability;
+                return;
             }
-            if ($this->waitNum < 0) {
-                $this->waitNum = 0;
-            }
+            $this->waitNum = max($this->waitNum - $this->capability, 0);
+            $this->toCloseCount -= $this->capability;
         }
     }
 }
-
 
 function findMinWaitRegisterIndex(array $registers): int
 {
