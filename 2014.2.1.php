@@ -3,30 +3,34 @@
 
 $commands = trim(fgets(STDIN));
 $registerNum = 5;
-$register1 = new Register(2);
-$register2 = new Register(7);
-$register3 = new Register(3);
-$register4 = new Register(5);
-$register5 = new Register(2);
+$register0 = new Register(2); //レジ番号1
+$register1 = new Register(7); //2
+$register2 = new Register(3); //3
+$register3 = new Register(5); //4
+$register4 = new Register(2); //5
 $registers = [];
 
-for ($i = 1; $i <= $registerNum; $i++) {
+for ($i = 0; $i < $registerNum; $i++) {
     $registers[] = ${'register'.$i};
 }
 
 
 foreach (str_split($commands) as $command) {
+    if(is_numeric($command)) {
+        $index = findMinWaitRegisterIndex($registers);
+        $registers[$index]->addWaitNum((int)$command);
+        continue;
+    }
     if ($command === '.') {
         foreach ($registers as $register) {
             $register->cashing();
         }
-    } elseif ($command === 'x') {
+        continue;
+    }
+    if ($command === 'x') {
         $index = findMinWaitRegisterIndex($registers);
         $registers[$index]->setToCloseCount();
         $registers[$index]->addWaitNum(1);
-    } elseif(is_numeric($command)) {
-        $index = findMinWaitRegisterIndex($registers);
-        $registers[$index]->addWaitNum((int)$command);
     }
 }
 
@@ -86,19 +90,14 @@ class Register
     }
 }
 
+
 function findMinWaitRegisterIndex(array $registers): int
 {
-    $minWaitNum = 999999;
-    $minWaitRegisterIndex = 0;
-    $count = 0;
+    $waitNums = [];
 
     foreach ($registers as $register) {
-        if ($register->getWaitNum() < $minWaitNum) {
-            $minWaitRegisterIndex = $count;
-            $minWaitNum = $register->getWaitNum();
-        }
-        $count++;
+        $waitNums[] = $register->getWaitNum();
     }
 
-    return $minWaitRegisterIndex;
+    return array_search(min($waitNums), $waitNums);
 }
