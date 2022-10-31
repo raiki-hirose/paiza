@@ -1,49 +1,52 @@
 <?php
-require_once 'Customer.php';
 
 class Register
 {
     private int $capability;
-    private int $waitingPeopleNum;
+    private array $waitingCustomers;
     private bool $stopping;
-    private int $toStopCount;
 
     public function __construct(int $capa)
     {
         $this->capability = $capa;
-        $this->waitingPeopleNum = 0;
+        $this->waitingCustomers = [];
         $this->stopping = false;
-        $this->toStopCount = -1;
     }
 
-    public function getWaitingPeopleNum(): int
+    public function addWaitingCustomers(Customer|StopperCustomer $customer): void
     {
-        return $this->waitingPeopleNum;
+        $this->waitingCustomers[] = $customer;
     }
 
-    public function addWaitingPeopleNum(int $addNum): void
+    public function getWaitingPeopleSum(): int
     {
-        $this->waitingPeopleNum += $addNum;
-    }
-
-    public function setToStopCount(): void
-    {
-        if ($this->toStopCount < 0) {
-            $this->toStopCount = $this->waitingPeopleNum;
+        $peopleSum = 0;
+        foreach ($this->waitingCustomers as $customer) {
+            $peopleSum += $customer->getNumOfPeople();
         }
+
+        return $peopleSum;
     }
 
     public function cashing(): void
     {
         if (!$this->stopping) {
-            if ($this->toStopCount <= $this->capability && $this->toStopCount >= 0) {
-                $this->waitingPeopleNum -= $this->toStopCount;
-                $this->toStopCount = 0;
-                $this->stopping = true;
-                return;
+            $remainReducePeopleNum = $this->capability;
+            while (!empty($this->waitingCustomers)) {
+                $headCustomer = $this->waitingCustomers[0];
+                if ($headCustomer->getNumOfPeople() <= $remainReducePeopleNum) {
+                    if ($headCustomer instanceof StopperCustomer) {
+                        $this->stopping = true;
+                        break;
+                    }
+                    $remainReducePeopleNum -= $headCustomer->getNumOfPeople();
+                    array_shift ($this->waitingCustomers);
+                    continue;
+                }
+
+                $headCustomer->reduceNumOfPeople($remainReducePeopleNum);
+                break;
             }
-            $this->waitingPeopleNum = max($this->waitingPeopleNum - $this->capability, 0);
-            $this->toStopCount -= $this->capability;
         }
     }
 }

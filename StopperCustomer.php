@@ -3,12 +3,12 @@ require_once 'Customer.php';
 
 class StopperCustomer extends Customer
 {
-    private $stopperCustomer;
+    private string $stopperCustomerChar;
 
-    public function __construct(int $registerIndex, int $numOfPeople, int $forwardCustomerNum, string $stopperCustomer)
+    public function __construct(int $numOfPeople, string $stopperCustomerChar)
     {
-        parent::__construct($registerIndex, $numOfPeople, $forwardCustomerNum);
+        parent::__construct($numOfPeople);
 
-        $this->stopperCustomer = $stopperCustomer;
+        $this->stopperCustomerChar = $stopperCustomerChar;
     }
 }

@@ -22,15 +22,13 @@ for ($i = 0; $i < $registerNum; $i++) {
 
 foreach (str_split($commands) as $command) {
     if(is_numeric($command)) {
-        $customer = new Customer($command);
+        $customer = new Customer((int)$command);
         $customer->standInRegister($registers);
-        getMinWaitingRegister($registers)->addWaitingPeopleNum((int)$command);
         continue;
     }
     if ($command === STOPPER_CUSTOMER) {
-        $minWaitingRegister = getMinWaitingRegister($registers);
-        $minWaitingRegister->setToStopCount();
-        $minWaitingRegister->addWaitingPeopleNum(1);
+        $stopperCustomer = new StopperCustomer(1, STOPPER_CUSTOMER);
+        $stopperCustomer->standInRegister($registers);
         continue;
     }
     if ($command === CASHING) {
@@ -42,18 +40,6 @@ foreach (str_split($commands) as $command) {
 }
 
 for ($i = 0; $i < $registerNum - 1; $i++) {
-    echo $registers[$i]->getWaitingPeopleNum().',';
+    echo $registers[$i]->getWaitingPeopleSum().',';
 }
-echo $registers[$registerNum - 1]->getWaitingPeopleNum(), PHP_EOL;
-
-
-function getMinWaitingRegister(array $registers): Register
-{
-    $waitingPeopleNums = [];
-
-    foreach ($registers as $register) {
-        $waitingPeopleNums[] = $register->getWaitingPeopleNum();
-    }
-
-    return $registers[array_search(min($waitingPeopleNums), $waitingPeopleNums)];
-}
+echo $registers[$registerNum - 1]->getWaitingPeopleSum(), PHP_EOL;

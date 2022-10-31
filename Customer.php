@@ -3,30 +3,35 @@
 class Customer
 {
     private int $numOfPeople;
-    private int $standingRegisterIndex;
-    private int $forwardCustomerNum;
 
     public function __construct(int $numOfPeople)
     {
         $this->numOfPeople = $numOfPeople;
     }
 
-    protected function findMinWaitingRegisterIndex(array $registers): int
+    public function getNumOfPeople(): int
+    {
+        return $this->numOfPeople;
+    }
+
+    public function reduceNumOfPeople(int $reduceNum): void
+    {
+        $this->numOfPeople -= $reduceNum;
+    }
+
+    protected function findMinWaitingRegister(array $registers): Register
     {
         $waitingPeopleNums = [];
 
         foreach ($registers as $register) {
-            $waitingPeopleNums[] = $register->getWaitingPeopleNum();
+            $waitingPeopleNums[] = $register->getWaitingPeopleSum();
         }
 
-        return array_search(min($waitingPeopleNums), $waitingPeopleNums);
+        return $registers[array_search(min($waitingPeopleNums), $waitingPeopleNums)];
     }
 
     public function standInRegister(array $registers): void
     {
-        $this->standingRegisterIndex = $this->findMinWaitingRegisterIndex($registers);
-        $standingRegister = $registers[$this->standingRegisterIndex];
-        $this->forwardCustomerNum = $standingRegister->getWaitingPeopleNum();
-        $standingRegister->addWaitingPeopleNum($this->numOfPeople);
+        $this->findMinWaitingRegister($registers)->addWaitingCustomers($this);
     }
 }
