@@ -34,11 +34,11 @@ class Register
             $remainReducePeopleNum = $this->capability;
             while (!empty($this->waitingCustomers)) {
                 $headCustomer = $this->waitingCustomers[0];
+                if ($headCustomer instanceof StopperCustomer) {
+                    $this->stopping = true;
+                    break;
+                }
                 if ($headCustomer->getNumOfPeople() <= $remainReducePeopleNum) {
-                    if ($headCustomer instanceof StopperCustomer) {
-                        $this->stopping = true;
-                        break;
-                    }
                     $remainReducePeopleNum -= $headCustomer->getNumOfPeople();
                     array_shift ($this->waitingCustomers);
                     continue;
